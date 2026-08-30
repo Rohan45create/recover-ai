@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "IBM Plex Serif", serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  --font-sans: "Work Sans", sans-serif;
+
+  --color-page: #F7F8FA;
+  --color-surface: #FFFFFF;
+  --color-sidebar: #FFFFFF;
+  
+  --color-border-default: #E4E7EC;
+
+  --color-text-primary: #14171F;
+  --color-text-secondary: #6B7280;
+  --color-text-inverse: #FFFFFF;
+
+  --color-accent-blue: #2E5AEA;
+
+  --color-semantic-green: #12A150;
+  --color-semantic-amber: #D97706;
+  --color-semantic-red: #DC2626;
+  --color-semantic-gray: #9CA3AF;
+
+  --color-surface-dark-panel: #14171F;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-page);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+
+  /* Reduced Motion Overrides */
+  [data-reduced-motion="true"] *,
+  [data-reduced-motion="true"] ::before,
+  [data-reduced-motion="true"] ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
