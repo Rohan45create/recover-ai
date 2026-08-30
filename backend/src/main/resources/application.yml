@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: recoverai
+  profiles:
+    active: dev
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+nearai:
+  url: ${NEAR_AI_URL:https://api.near.ai/v1/chat/completions}
+  key: ${NEAR_AI_KEY:}
+  model: ${NEAR_AI_MODEL:gemma-4-31b-it}
+
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID:rzp_test_stub}
+  key-secret: ${RAZORPAY_KEY_SECRET:stub_secret}
+  webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:stub_webhook_secret}
