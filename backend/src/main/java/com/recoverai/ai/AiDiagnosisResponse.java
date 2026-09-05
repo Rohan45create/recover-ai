@@ -12,4 +12,5 @@ public class AiDiagnosisResponse {
     private List<String> candidateActions;
     
     private String rationale;
+    private String aiProvider;
 }

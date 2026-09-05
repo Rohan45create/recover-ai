@@ -23,7 +23,8 @@ public class PromptBuilder {
         
         Map<String, Object> systemMessage = new HashMap<>();
         systemMessage.put("role", "system");
-        systemMessage.put("content", "You are a recovery diagnosis agent. Respond ONLY with JSON containing 'diagnosis', 'candidate_actions' (list of strings), and 'rationale'.");
+        systemMessage.put("content", "You are a recovery diagnosis agent. Respond ONLY with JSON containing 'diagnosis', 'candidate_actions' (list of strings), and 'rationale'. " +
+                "The 'candidate_actions' list MUST ONLY contain exact values from this set: [\"RETRY\", \"SEND_SMS\", \"SEND_WHATSAPP\", \"SEND_EMAIL\", \"SEND_REMINDER\", \"CREATE_PAYMENT_LINK\"].");
         
         Map<String, Object> userMessage = new HashMap<>();
         userMessage.put("role", "user");
