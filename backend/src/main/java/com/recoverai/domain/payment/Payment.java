@@ -41,11 +41,17 @@ public class Payment {
     @Column(length = 50)
     private String contact;
 
+    @Column(length = 255)
+    private String email;
+
     @Column(name = "error_code")
     private String errorCode;
 
     @Column(name = "error_description")
     private String errorDescription;
+
+    @Column(name = "order_id")
+    private String orderId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;

@@ -39,8 +39,14 @@ public class RecoveryCase {
     @Column(name = "chosen_action", length = 255)
     private String chosenAction;
 
-    @Column(name = "expected_value")
-    private BigDecimal expectedValue;
+    @Column(name = "expected_recovery_value")
+    private BigDecimal expectedRecoveryValue;
+
+    @Column(name = "actual_recovered_amount")
+    private BigDecimal actualRecoveredAmount;
+
+    @Column(name = "payment_link_url", length = 512)
+    private String paymentLinkUrl;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;

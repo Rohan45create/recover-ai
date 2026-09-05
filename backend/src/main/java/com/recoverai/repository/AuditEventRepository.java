@@ -15,4 +15,7 @@ public interface AuditEventRepository extends JpaRepository<AuditEvent, UUID> {
     Integer findMaxSequenceNoByCaseId(@org.springframework.data.repository.query.Param("caseId") UUID caseId);
 
     long countByEventType(String eventType);
+
+    @org.springframework.data.jpa.repository.Query(value = "SELECT COUNT(*) FROM audit_events WHERE event_type = 'POLICY_EVALUATION' AND CAST(payload AS TEXT) LIKE '%\"outcome\":\"BLOCKED\"%'", nativeQuery = true)
+    long countBlockedPolicyEvaluations();
 }
