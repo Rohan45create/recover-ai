@@ -8,6 +8,7 @@ import java.util.List;
 public class PolicyEvaluationResult {
     private List<ActionEvaluation> evaluations;
     private List<String> permittedActions;
+    private boolean escalationRequired;
 
     @Data
     @AllArgsConstructor

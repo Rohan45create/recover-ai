@@ -1,46 +1,55 @@
 package com.recoverai.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.recoverai.domain.policy.Policy;
+import com.recoverai.service.PolicyService;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/dashboard/policies")
+@RequiredArgsConstructor
 public class PolicyController {
 
-    private List<Policy> mockPolicies = Arrays.asList(
-            new Policy("POL-01", "Max Recovery Cost", "Limit the AI's execution budget per case", "5.0", "INR", true),
-            new Policy("POL-02", "DND Hours Exclusion", "Block communication during regulatory Do Not Disturb hours", "21:00-08:00", "TIME", true),
-            new Policy("POL-03", "Mandate Window Expiry", "Prevent retry actions 24 hours before mandate expires", "24", "HOURS", true),
-            new Policy("POL-04", "Escalation Threshold", "Require manual approval for recovery amounts over limit", "50000", "INR", false)
-    );
+    private final PolicyService policyService;
 
+    /** GET /api/dashboard/policies — returns all policies from DB */
     @GetMapping
     public List<Policy> getPolicies() {
-        return mockPolicies;
+        return policyService.getAllPolicies();
     }
 
+    /** PUT /api/dashboard/policies/{id} — update a single policy (value and/or enabled) */
+    @PutMapping("/{id}")
+    public ResponseEntity<Policy> updatePolicy(
+            @PathVariable String id,
+            @RequestBody PolicyUpdateRequest body) {
+        try {
+            Policy updated = policyService.updatePolicy(id, body.getValue(), body.getEnabled(), "dashboard-user");
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /** POST /api/dashboard/policies — legacy bulk-update kept for backward compat; updates each policy individually */
     @PostMapping
-    public List<Policy> updatePolicies(@RequestBody List<Policy> updated) {
-        this.mockPolicies = updated;
-        return this.mockPolicies;
+    public List<Policy> updatePolicies(@RequestBody List<PolicyUpdateRequest> updates) {
+        updates.forEach(u -> {
+            if (u.getId() != null) {
+                policyService.updatePolicy(u.getId(), u.getValue(), u.getEnabled(), "dashboard-user");
+            }
+        });
+        return policyService.getAllPolicies();
     }
 
     @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Policy {
+    public static class PolicyUpdateRequest {
         private String id;
-        private String name;
-        private String description;
         private String value;
-        private String unit;
-        private boolean active;
+        private Boolean enabled;
     }
 }

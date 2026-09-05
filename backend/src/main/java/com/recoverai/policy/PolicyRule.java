@@ -9,4 +9,9 @@ import java.util.List;
 public interface PolicyRule {
     boolean isPermitted(RecoveryCase rc, Payment payment, String candidateAction, List<AuditEvent> history);
     String getReason();
+
+    /** True when the payment should be routed to ESCALATED status rather than STOPPED. */
+    default boolean isEscalationRequired() {
+        return false;
+    }
 }

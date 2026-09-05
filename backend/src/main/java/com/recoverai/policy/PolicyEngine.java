@@ -20,19 +20,23 @@ public class PolicyEngine {
     public PolicyEvaluationResult filterPermittedActions(RecoveryCase rc, Payment payment, List<String> candidateActions, List<AuditEvent> history) {
         List<String> permitted = new ArrayList<>();
         List<PolicyEvaluationResult.ActionEvaluation> evaluations = new ArrayList<>();
-        
+        boolean escalationRequired = false;
+
         for (String action : candidateActions) {
             boolean actionPermitted = true;
             String blockReason = null;
             for (PolicyRule rule : rules) {
                 if (!rule.isPermitted(rc, payment, action, history)) {
                     blockReason = rule.getReason();
+                    if (rule.isEscalationRequired()) {
+                        escalationRequired = true;
+                    }
                     log.info("Action {} blocked for case {} due to: {}", action, rc.getId(), blockReason);
                     actionPermitted = false;
                     break;
                 }
             }
-            
+
             if (actionPermitted) {
                 permitted.add(action);
                 evaluations.add(new PolicyEvaluationResult.ActionEvaluation(action, true, "Passed all rules"));
@@ -40,7 +44,7 @@ public class PolicyEngine {
                 evaluations.add(new PolicyEvaluationResult.ActionEvaluation(action, false, blockReason));
             }
         }
-        
-        return new PolicyEvaluationResult(evaluations, permitted);
+
+        return new PolicyEvaluationResult(evaluations, permitted, escalationRequired);
     }
 }
