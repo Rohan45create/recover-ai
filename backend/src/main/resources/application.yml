@@ -5,13 +5,32 @@ spring:
     active: dev
   jackson:
     property-naming-strategy: SNAKE_CASE
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8080
+
+api:
+  demo-key: ${API_DEMO_KEY:}
 
 nearai:
-  url: ${NEAR_AI_URL:https://api.near.ai/v1/chat/completions}
+  url: ${NEAR_AI_URL:https://cloud.near.ai/v1/chat/completions}
   key: ${NEAR_AI_KEY:}
-  model: ${NEAR_AI_MODEL:gemma-4-31b-it}
+  model: ${NEAR_AI_MODEL:google/gemini-2.5-flash-lite}
 
 razorpay:
   key-id: ${RAZORPAY_KEY_ID:rzp_test_stub}
   key-secret: ${RAZORPAY_KEY_SECRET:stub_secret}
   webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:stub_webhook_secret}
+
+groq:
+  url: ${GROQ_URL:https://api.groq.com/openai/v1/chat/completions}
+  key: ${GROQ_API_KEY:}
+  model: ${GROQ_MODEL:openai/gpt-oss-120b}
