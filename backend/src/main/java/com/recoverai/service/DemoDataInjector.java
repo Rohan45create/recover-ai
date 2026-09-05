@@ -37,7 +37,14 @@ public class DemoDataInjector implements CommandLineRunner {
             return;
         }
 
-        log.info("Database is empty. Injecting 200 synthetic cases for demo dashboard...");
+        log.info("Database is empty. Checking for seed-data...");
+        org.springframework.core.io.ClassPathResource resource = new org.springframework.core.io.ClassPathResource("evaluation/seed-data/synthetic_payments_combined.json");
+        if (!resource.exists()) {
+            log.warn("Seed data not found on classpath — skipping demo seed. Run the azure-seed profile locally against this database if synthetic data is needed.");
+            return;
+        }
+
+        log.info("Injecting 200 synthetic cases for demo dashboard...");
         
         List<DatasetGenerator.SyntheticCase> syntheticCases = datasetGenerator.generate(200, 1337L);
         

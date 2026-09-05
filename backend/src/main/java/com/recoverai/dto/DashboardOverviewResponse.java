@@ -18,5 +18,6 @@ public class DashboardOverviewResponse {
     private long activeCases;
     private long totalCases;
     private long policyViolations;
+    private double efficiencyScore;
     private List<TrajectoryPoint> trajectory;
 }

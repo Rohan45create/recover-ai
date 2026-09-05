@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${AZURE_DB_HOST}:5432/recoverai?sslmode=require
+    username: recoverai
+    password: ${AZURE_DB_PASSWORD}

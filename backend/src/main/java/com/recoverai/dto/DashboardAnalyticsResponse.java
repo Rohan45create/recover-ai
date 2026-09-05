@@ -16,7 +16,7 @@ public class DashboardAnalyticsResponse {
 
     private List<DiagnosisSplit> diagnosisSplit;
     private List<ActionEffectiveness> actionEffectiveness;
-    private double decisionAccuracy;
+    private Double decisionAccuracy;
     private double policyBlockRate;
 
     @Data
