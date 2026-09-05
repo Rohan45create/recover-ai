@@ -1,7 +1,6 @@
 import { ArrowUpRight } from 'lucide-react';
 
-export function EfficiencyScore() {
-  const score = 78.6;
+export function EfficiencyScore({ score }: { score: number }) {
   // Circumference = 2 * pi * r = 2 * Math.PI * 40 = 251.2
   const circumference = 251.2;
   const strokeDashoffset = circumference - (score / 100) * circumference;

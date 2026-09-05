@@ -77,6 +77,17 @@ export function RecoveryLogTimeline({ events }: TimelineProps) {
                           <span className="px-2 py-1 bg-accent-blue/10 text-accent-blue font-medium rounded text-[10px] uppercase">
                             Confidence: {event.details?.confidence || '0.90'}
                           </span>
+                          {event.details?.ai_provider === 'NEAR_AI' ? (
+                            <span className="px-2 py-1 bg-semantic-green/10 text-semantic-green border border-semantic-green/20 rounded text-[10px] font-bold flex items-center gap-1">
+                              <CheckCircle2 size={10} />
+                              TEE VERIFIED
+                            </span>
+                          ) : event.details?.ai_provider === 'GROQ_FALLBACK' ? (
+                            <span className="px-2 py-1 bg-purple-500/10 text-purple-600 border border-purple-500/20 rounded text-[10px] font-bold flex items-center gap-1">
+                              <Cpu size={10} />
+                              AI VERIFIED
+                            </span>
+                          ) : null}
                         </div>
                       </>
                     )}
@@ -102,12 +113,51 @@ export function RecoveryLogTimeline({ events }: TimelineProps) {
                     {event.event_type === 'DECISION' && (
                       <>
                         Selected <span className="font-medium text-text-primary">{event.details?.chosen_action || 'an action'}</span>. Decision sealed by policy engine.
+                        {event.details?.computation && (
+                          <div className="mt-3 p-3 bg-page border border-border-default rounded-lg font-mono text-[11px]">
+                            <div className="text-[10px] text-text-secondary mb-2 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                              <Activity size={12} />
+                              Expected Value Computation
+                            </div>
+                            <div className="flex flex-col gap-1.5 text-text-secondary">
+                              <div className="flex items-center gap-2">
+                                <span className="text-text-primary w-6">EV</span>
+                                <span>=</span>
+                                <span>(Amount × P(recovery)) - Cost</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-text-primary font-medium">
+                                <span className="text-semantic-green w-6">₹{event.details.expected_value}</span>
+                                <span className="text-text-secondary">=</span>
+                                <span>(₹{event.details.computation.amount} × {event.details.computation.probability}) - ₹{event.details.computation.cost}</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </>
                     )}
 
                     {event.event_type === 'TOOL_EXECUTION' && (
                       <>
-                        Recovery request accepted by the tool. Idempotency key is locked for this case.
+                        {event.details?.short_url ? (
+                          <>
+                            Payment link created successfully. Customer will be redirected to complete payment.
+                            <div className="mt-3 flex flex-col gap-2">
+                              <a
+                                href={event.details.short_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-3 py-2 bg-accent-blue text-white rounded-lg text-xs font-semibold hover:bg-accent-blue/90 transition-colors w-max"
+                              >
+                                Open Payment Link ↗
+                              </a>
+                              <span className="font-mono text-[10px] text-text-secondary break-all">{event.details.short_url}</span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            Recovery request accepted by the tool. Idempotency key is locked for this case.
+                          </>
+                        )}
                         <div className="mt-3">
                           <span className="px-2 py-1 bg-semantic-green/10 text-semantic-green border border-semantic-green/20 rounded text-[10px] font-mono flex items-center gap-1 w-max">
                             <Lock size={10} />
@@ -119,15 +169,31 @@ export function RecoveryLogTimeline({ events }: TimelineProps) {
 
                     {event.event_type === 'OUTCOME' && (
                       <>
-                        Funds recovered and ledger marked settled. Customer notification queued; reconciliation will verify the bank reference in the next sweep.
+                        <div className="leading-relaxed">
+                          {event.details?.reason || 'Outcome recorded.'}
+                        </div>
+                        {/* Render short_url as a clickable link if present in OUTCOME payload */}
+                        {event.details?.short_url && event.details.short_url !== 'unavailable' && (
+                          <div className="mt-3">
+                            <a
+                              href={event.details.short_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-3 py-2 bg-accent-blue text-white rounded-lg text-xs font-semibold hover:bg-accent-blue/90 transition-colors w-max"
+                            >
+                              Open Payment Link ↗
+                            </a>
+                          </div>
+                        )}
                         <div className="flex gap-2 mt-3">
-                          <span className="px-2 py-1 bg-semantic-green/10 text-semantic-green border border-semantic-green/20 rounded text-[10px] font-bold flex items-center gap-1">
-                            <CheckCircle2 size={10} />
-                            TEE VERIFIED
-                          </span>
                           <span className="px-2 py-1 bg-page text-text-secondary border border-border-default rounded text-[10px] font-mono">
-                            BANK REF - {event.details?.reference_id || 'PENDING'}
+                            {event.details?.status || 'UNKNOWN'}
                           </span>
+                          {event.details?.amount && (
+                            <span className="px-2 py-1 bg-semantic-green/10 text-semantic-green border border-semantic-green/20 rounded text-[10px] font-mono">
+                              ₹{event.details.amount}
+                            </span>
+                          )}
                         </div>
                       </>
                     )}

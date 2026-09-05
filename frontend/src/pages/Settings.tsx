@@ -53,51 +53,47 @@ export function Settings() {
         })}
       </div>
 
-      {activeTab === 'Appearance' && (
-        <>
-          {/* Profile Section */}
-      <section className="bg-surface border border-border-default rounded-xl overflow-hidden">
-        <div className="px-6 py-5 border-b border-border-default">
-          <h2 className="text-lg font-display font-semibold text-text-primary">Appearance & Accessibility</h2>
-          <p className="text-sm text-text-secondary mt-1">Manage how the dashboard looks and behaves.</p>
-        </div>
-        <div className="p-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Accessibility size={18} className="text-accent-blue" />
-                <span className="font-medium text-text-primary">Reduced Motion</span>
-              </div>
-              <p className="text-sm text-text-secondary">Disable animations, transitions, and particle effects.</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                className="sr-only peer" 
-                checked={reducedMotion}
-                onChange={(e) => setReducedMotion(e.target.checked)}
-              />
-              <div className="w-11 h-6 bg-border-default peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-blue"></div>
-            </label>
+      {activeTab === 'Appearance' ? (
+        <section className="bg-surface border border-border-default rounded-xl overflow-hidden">
+          <div className="px-6 py-5 border-b border-border-default">
+            <h2 className="text-lg font-display font-semibold text-text-primary">Appearance & Accessibility</h2>
+            <p className="text-sm text-text-secondary mt-1">Manage how the dashboard looks and behaves.</p>
           </div>
-        </div>
-      </section>
-      
-      {/* Existing Settings Placeholders */}
-      <section className="bg-surface border border-border-default rounded-xl overflow-hidden">
-        <div className="px-6 py-5 border-b border-border-default">
-          <h2 className="text-lg font-display font-semibold text-text-primary">General Settings</h2>
-          <p className="text-sm text-text-secondary mt-1">Configure your workspace preferences.</p>
-        </div>
-        <div className="p-6 flex flex-col items-center justify-center py-16 text-center">
-          <SettingsIcon size={48} className="text-text-secondary mb-4 opacity-50" />
-          <h3 className="text-lg font-medium text-text-primary mb-2">Settings Configuration</h3>
-          <p className="text-sm text-text-secondary max-w-md">
-            Integration configuration, API keys, and team management will be available here.
-          </p>
-        </div>
-      </section>
-        </>
+          <div className="p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Accessibility size={18} className="text-accent-blue" />
+                  <span className="font-medium text-text-primary">Reduced Motion</span>
+                </div>
+                <p className="text-sm text-text-secondary">Disable animations, transitions, and particle effects.</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="sr-only peer" 
+                  checked={reducedMotion}
+                  onChange={(e) => setReducedMotion(e.target.checked)}
+                />
+                <div className="w-11 h-6 bg-border-default peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-blue"></div>
+              </label>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="bg-surface border border-border-default rounded-xl overflow-hidden">
+          <div className="px-6 py-5 border-b border-border-default">
+            <h2 className="text-lg font-display font-semibold text-text-primary">{activeTab} Settings</h2>
+            <p className="text-sm text-text-secondary mt-1">Configure your workspace preferences.</p>
+          </div>
+          <div className="p-6 flex flex-col items-center justify-center py-16 text-center">
+            <SettingsIcon size={48} className="text-text-secondary mb-4 opacity-50" />
+            <h3 className="text-lg font-medium text-text-primary mb-2">Settings Configuration</h3>
+            <p className="text-sm text-text-secondary max-w-md">
+              Integration configuration, API keys, and team management will be available here.
+            </p>
+          </div>
+        </section>
       )}
     </div>
   );

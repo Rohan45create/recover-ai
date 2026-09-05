@@ -1,4 +1,4 @@
-import { DashboardOverviewResponse } from '../../api';
+import type { DashboardOverviewResponse } from '../../api';
 
 interface KpiGridProps {
   overview: DashboardOverviewResponse;

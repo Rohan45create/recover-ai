@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { api, type DashboardOverviewResponse } from '../api';
 import { KpiGrid } from '../components/overview/KpiGrid';
@@ -8,25 +8,43 @@ import { EfficiencyScore } from '../components/overview/EfficiencyScore';
 import { CaseStatus } from '../components/overview/CaseStatus';
 import { AiProposalFeed } from '../components/overview/AiProposalFeed';
 
+const POLL_INTERVAL_MS = 5000;
+
 export function Overview() {
   const [overview, setOverview] = useState<DashboardOverviewResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastSynced, setLastSynced] = useState<Date | null>(null);
+  const [secondsSince, setSecondsSince] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  async function loadData() {
+    try {
+      const overviewData = await api.getOverview();
+      console.log("Fetched Dashboard Overview Payload:", overviewData);
+      setOverview(overviewData);
+      setError(null);
+      setLastSynced(new Date());
+      setSecondsSince(0);
+    } catch (err) {
+      console.error('Failed to load dashboard data', err);
+      setError('Failed to load dashboard data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const overviewData = await api.getOverview();
-        setOverview(overviewData);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to load dashboard data", err);
-        setError("Failed to load dashboard data. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    }
     loadData();
+    intervalRef.current = setInterval(loadData, POLL_INTERVAL_MS);
+    tickRef.current = setInterval(() => {
+      setSecondsSince(s => s + 1);
+    }, 1000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (tickRef.current) clearInterval(tickRef.current);
+    };
   }, []);
 
   if (loading) {
@@ -62,6 +80,20 @@ export function Overview() {
 
   return (
     <div className="space-y-8 max-w-[1100px] mx-auto pb-12">
+      {/* LIVE indicator */}
+      <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center gap-1.5 text-[12px]">
+          <span className="inline-flex relative">
+            <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+          </span>
+          <span className="font-medium text-green-400">LIVE</span>
+          {lastSynced && (
+            <span className="text-text-secondary ml-1">· synced {secondsSince}s ago</span>
+          )}
+        </div>
+      </div>
+
       {/* KPI Row */}
       <KpiGrid overview={overview} />
 
@@ -76,7 +108,7 @@ export function Overview() {
           <RecoveryEngine />
         </div>
         <div className="h-full">
-          <EfficiencyScore />
+          <EfficiencyScore score={overview.efficiency_score || 0} />
         </div>
       </div>
 

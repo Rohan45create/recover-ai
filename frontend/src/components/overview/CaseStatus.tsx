@@ -1,5 +1,5 @@
 import { Check, Clock, AlertTriangle, Pause } from 'lucide-react';
-import { DashboardOverviewResponse } from '../../api';
+import type { DashboardOverviewResponse } from '../../api';
 import clsx from 'clsx';
 
 interface CaseStatusProps {

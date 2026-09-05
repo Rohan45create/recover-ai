@@ -16,7 +16,8 @@ export function Policies() {
   async function loadPolicies() {
     try {
       const data = await api.getPolicies();
-      setPolicies(data);
+      // Map backend 'enabled' -> frontend 'active', 'value' stays 'value'
+      setPolicies(data.map((p: any) => ({ ...p, active: p.enabled ?? p.active })));
     } catch (err) {
       console.error("Failed to load policies", err);
     } finally {
@@ -32,12 +33,9 @@ export function Policies() {
   const handleSave = async (policy: any) => {
     try {
       setSaving(true);
-      const updatedPolicies = policies.map(p => 
-        p.id === policy.id ? { ...p, value: editValue } : p
-      );
-      await api.updatePolicies(updatedPolicies);
-      setPolicies(updatedPolicies);
+      await api.updatePolicy(policy.id, { value: editValue });
       setEditingId(null);
+      await loadPolicies(); // Re-fetch from server to prove persistence
     } catch (err) {
       console.error("Failed to update policy", err);
       alert("Failed to save policy.");
@@ -48,11 +46,8 @@ export function Policies() {
 
   const toggleStatus = async (policy: any) => {
     try {
-      const updatedPolicies = policies.map(p => 
-        p.id === policy.id ? { ...p, active: !p.active } : p
-      );
-      await api.updatePolicies(updatedPolicies);
-      setPolicies(updatedPolicies);
+      await api.updatePolicy(policy.id, { enabled: !policy.active });
+      await loadPolicies(); // Re-fetch from server to prove persistence
     } catch (err) {
       console.error("Failed to toggle policy", err);
     }

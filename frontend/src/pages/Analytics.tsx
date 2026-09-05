@@ -7,12 +7,16 @@ const COLORS = ['#2E5AEA', '#12A150', '#D97706', '#9CA3AF', '#DC2626'];
 
 export function Analytics() {
   const [analytics, setAnalytics] = useState<any>(null);
+  const [range, setRange] = useState('Last 30 days');
+  const [diagnosis, setDiagnosis] = useState('All diagnoses');
+  const [action, setAction] = useState('All actions');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const data = await api.getAnalytics();
+        setLoading(true);
+        const data = await api.getAnalytics({ range, diagnosis, action });
         setAnalytics(data);
       } catch (err) {
         console.error("Failed to load analytics", err);
@@ -21,7 +25,7 @@ export function Analytics() {
       }
     }
     loadData();
-  }, []);
+  }, [range, diagnosis, action]);
 
   if (loading) {
     return <div className="p-8 text-center text-text-secondary">Loading Analytics...</div>;
@@ -51,8 +55,12 @@ export function Analytics() {
           
           <div className="flex gap-4">
             <div>
-              <div className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-wider mb-1">Date Range</div>
-              <select className="bg-page border border-border-default text-[13px] text-text-primary rounded-md px-3 py-1.5 outline-none min-w-[140px]">
+              <div className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-wider mb-1">Range</div>
+              <select 
+                className="bg-page border border-border-default text-[13px] text-text-primary rounded-md px-3 py-1.5 outline-none min-w-[140px]"
+                value={range}
+                onChange={e => setRange(e.target.value)}
+              >
                 <option>Last 30 days</option>
                 <option>Last 7 days</option>
               </select>
@@ -60,14 +68,22 @@ export function Analytics() {
             
             <div>
               <div className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-wider mb-1">Diagnosis</div>
-              <select className="bg-page border border-border-default text-[13px] text-text-primary rounded-md px-3 py-1.5 outline-none min-w-[140px]">
+              <select 
+                className="bg-page border border-border-default text-[13px] text-text-primary rounded-md px-3 py-1.5 outline-none min-w-[140px]"
+                value={diagnosis}
+                onChange={e => setDiagnosis(e.target.value)}
+              >
                 <option>All diagnoses</option>
               </select>
             </div>
 
             <div>
               <div className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-wider mb-1">Action</div>
-              <select className="bg-page border border-border-default text-[13px] text-text-primary rounded-md px-3 py-1.5 outline-none min-w-[140px]">
+              <select 
+                className="bg-page border border-border-default text-[13px] text-text-primary rounded-md px-3 py-1.5 outline-none min-w-[140px]"
+                value={action}
+                onChange={e => setAction(e.target.value)}
+              >
                 <option>All actions</option>
               </select>
             </div>
@@ -92,9 +108,15 @@ export function Analytics() {
           </div>
           <div>
             <div className="text-sm font-sans font-semibold text-text-secondary">Decision Accuracy (Eval Baseline)</div>
-            <div className="font-mono text-3xl font-medium text-text-primary mt-1">
-              {analytics.decision_accuracy?.toFixed(1) ?? '0.0'}%
-            </div>
+            {analytics.decision_accuracy == null ? (
+              <div className="font-mono text-xl font-medium text-text-secondary mt-1 mt-2">
+                Insufficient data
+              </div>
+            ) : (
+              <div className="font-mono text-3xl font-medium text-text-primary mt-1">
+                {analytics.decision_accuracy.toFixed(1)}%
+              </div>
+            )}
           </div>
         </div>
 
