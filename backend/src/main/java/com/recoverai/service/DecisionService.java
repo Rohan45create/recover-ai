@@ -6,9 +6,13 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class DecisionService {
+    
+    private static final Logger log = LoggerFactory.getLogger(DecisionService.class);
 
     public DecisionResult selectBestAction(RecoveryCase rc, Payment payment, List<String> permittedActions) {
         if (permittedActions == null || permittedActions.isEmpty()) {
@@ -36,7 +40,23 @@ public class DecisionService {
             return new DecisionResult("NONE", BigDecimal.ZERO);
         }
 
-        return new DecisionResult(bestAction, bestEV);
+        BigDecimal pRecovery = getRecoveryProbability(rc.getDiagnosis(), bestAction);
+        BigDecimal cost = getActionCost(bestAction);
+        BigDecimal amount = payment.getAmount();
+        String frictionPenalty = "0.00"; // Dummy friction penalty requested by user
+        
+        log.info("[DECISION] case={} action={} P(recovery)={} amount={} interventionCost={} frictionPenalty={} => expectedValue=({}*{})-{}-{} = {}", 
+                 rc.getId(), bestAction, pRecovery, amount, cost, frictionPenalty, 
+                 pRecovery, amount, cost, frictionPenalty, bestEV);
+
+        return new DecisionResult(
+            bestAction, 
+            bestEV, 
+            pRecovery, 
+            amount, 
+            cost, 
+            new BigDecimal(frictionPenalty)
+        );
     }
 
     private BigDecimal getRecoveryProbability(String diagnosis, String action) {
@@ -47,17 +67,20 @@ public class DecisionService {
         return switch (diagnosis) {
             case "INSUFFICIENT_FUNDS" -> switch (action) {
                 case "RETRY" -> new BigDecimal("0.40");
+                case "CREATE_PAYMENT_LINK" -> new BigDecimal("0.65"); // Dedicated link removes friction, higher than retry
                 case "SEND_SMS" -> new BigDecimal("0.15");
                 case "SEND_WHATSAPP" -> new BigDecimal("0.20");
                 default -> new BigDecimal("0.05");
             };
             case "TEMPORARY_SYSTEM_FAILURE" -> switch (action) {
                 case "RETRY" -> new BigDecimal("0.80");
+                case "CREATE_PAYMENT_LINK" -> new BigDecimal("0.50"); // Less relevant than retry for system failures
                 default -> new BigDecimal("0.10");
             };
             case "FRAUD_SUSPECTED" -> new BigDecimal("0.00"); // Never try to recover fraud
             default -> switch (action) {
                 case "RETRY" -> new BigDecimal("0.10");
+                case "CREATE_PAYMENT_LINK" -> new BigDecimal("0.35"); // Link still more effective than email for unknown causes
                 case "SEND_EMAIL" -> new BigDecimal("0.10");
                 default -> new BigDecimal("0.05");
             };
@@ -68,7 +91,7 @@ public class DecisionService {
         return switch (action) {
             case "SEND_SMS" -> new BigDecimal("1.00");
             case "SEND_WHATSAPP" -> new BigDecimal("2.50");
-            case "SEND_EMAIL", "RETRY" -> BigDecimal.ZERO;
+            case "SEND_EMAIL", "RETRY", "CREATE_PAYMENT_LINK" -> BigDecimal.ZERO;
             default -> BigDecimal.ZERO;
         };
     }

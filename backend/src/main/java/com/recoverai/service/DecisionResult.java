@@ -11,5 +11,16 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class DecisionResult {
     private String chosenAction;
-    private BigDecimal expectedValue;
+    private BigDecimal expectedRecoveryValue;
+    
+    // Computation details for audit logging
+    private BigDecimal probabilityOfRecovery;
+    private BigDecimal baseAmount;
+    private BigDecimal interventionCost;
+    private BigDecimal frictionPenalty;
+    
+    public DecisionResult(String chosenAction, BigDecimal expectedRecoveryValue) {
+        this.chosenAction = chosenAction;
+        this.expectedRecoveryValue = expectedRecoveryValue;
+    }
 }

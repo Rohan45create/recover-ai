@@ -7,11 +7,25 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotificationSender {
 
-    public void send(String channel, String customerId, String idempotencyKey) {
-        log.info("Sending notification via channel '{}' to customer '{}', idempotency_key='{}'", 
-                 channel, customerId, idempotencyKey);
-        
-        // Simulates network delay or API call
-        // In a real system, we might use Twilio or Gupshup for SMS/WhatsApp
+    /**
+     * Dispatches a reminder notification to the customer.
+     *
+     * @param channel        notification type (SEND_REMINDER, SEND_SMS, SEND_WHATSAPP, SEND_EMAIL)
+     * @param customerId     internal customer/payment ID for traceability
+     * @param idempotencyKey dedup key
+     * @param contact        customer phone number (may be null)
+     * @param email          customer email address (may be null)
+     */
+    public void send(String channel, String customerId, String idempotencyKey, String contact, String email) {
+        log.info("Sending notification via channel='{}' to customerId='{}', idempotency_key='{}', contact={}, email={}",
+                 channel, customerId, idempotencyKey,
+                 contact != null ? contact : "<none>",
+                 email   != null ? email   : "<none>");
+
+        // In a real system, we would dispatch to Twilio (SMS), Gupshup (WhatsApp), or an email provider here.
+        // The actual delivery depends on which fields are present:
+        if (contact == null && email == null) {
+            log.warn("NotificationSender called with no contact info for customerId={} — skipping dispatch", customerId);
+        }
     }
 }

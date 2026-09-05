@@ -51,8 +51,9 @@ public class RecoveryCaseReconstructor {
                     if (payload.has("chosen_action")) {
                         rc.setChosenAction(payload.get("chosen_action").asText());
                     }
-                    if (payload.has("expected_value")) {
-                        rc.setExpectedValue(new java.math.BigDecimal(payload.get("expected_value").asText()));
+                    JsonNode expectedValue = payload.get("expected_value");
+                    if (expectedValue != null) {
+                        rc.setExpectedRecoveryValue(new java.math.BigDecimal(expectedValue.asText()));
                     }
                     if (payload.has("next_run_at")) {
                         rc.setNextRunAt(OffsetDateTime.parse(payload.get("next_run_at").asText()));
