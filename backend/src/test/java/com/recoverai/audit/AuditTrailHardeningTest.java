@@ -95,7 +95,7 @@ class AuditTrailHardeningTest {
         assertThat(reconstructed.getId()).isEqualTo(caseId);
         assertThat(reconstructed.getStatus()).isEqualTo(CaseState.ACTION_PENDING);
         assertThat(reconstructed.getChosenAction()).isEqualTo("RETRY");
-        assertThat(reconstructed.getExpectedValue()).isEqualByComparingTo("250.00");
+        assertThat(reconstructed.getExpectedRecoveryValue()).isEqualByComparingTo("250.00");
         assertThat(reconstructed.getCreatedAt()).isNotNull();
     }
 }

@@ -53,7 +53,7 @@ class WebhookControllerTest {
                 "payment": {
                   "entity": {
                     "id": "pay_123",
-                    "amount": 1000,
+                    "amount": 500000,
                     "currency": "INR",
                     "status": "failed",
                     "error_code": "BAD_REQUEST_ERROR"
@@ -63,8 +63,19 @@ class WebhookControllerTest {
             }
             """;
 
+        RazorpayWebhookPayload capturedPayload = new RazorpayWebhookPayload();
+        RazorpayWebhookPayload.Payload payloadWrapper = new RazorpayWebhookPayload.Payload();
+        RazorpayWebhookPayload.PaymentEntity paymentEntity = new RazorpayWebhookPayload.PaymentEntity();
+        RazorpayWebhookPayload.Entity entity = new RazorpayWebhookPayload.Entity();
+        entity.setId("pay_123");
+        entity.setAmount(new java.math.BigDecimal("500000")); // parsed amount before controller manipulates it
+        paymentEntity.setEntity(entity);
+        payloadWrapper.setPayment(paymentEntity);
+        capturedPayload.setPayload(payloadWrapper);
+        capturedPayload.setEvent("payment.failed");
+
         when(signatureVerifier.verifySignature(anyString(), eq("valid_sig"))).thenReturn(true);
-        when(objectMapper.readValue(anyString(), eq(RazorpayWebhookPayload.class))).thenReturn(new RazorpayWebhookPayload());
+        when(objectMapper.readValue(anyString(), eq(RazorpayWebhookPayload.class))).thenReturn(capturedPayload);
 
         mockMvc.perform(post("/api/webhooks/razorpay")
                 .header("X-Razorpay-Signature", "valid_sig")
@@ -73,6 +84,7 @@ class WebhookControllerTest {
                 .andExpect(status().isOk());
 
         verify(ingestionService).processWebhook(any(RazorpayWebhookPayload.class));
+        org.junit.jupiter.api.Assertions.assertEquals(new java.math.BigDecimal("5000.00").compareTo(capturedPayload.getPayload().getPayment().getEntity().getAmount()), 0);
     }
     
     @Test

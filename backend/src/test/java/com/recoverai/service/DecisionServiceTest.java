@@ -28,7 +28,7 @@ class DecisionServiceTest {
         DecisionResult result = decisionService.selectBestAction(rc, p, List.of("RETRY", "SEND_SMS", "SEND_WHATSAPP"));
 
         assertThat(result.getChosenAction()).isEqualTo("RETRY");
-        assertThat(result.getExpectedValue()).isEqualByComparingTo(new BigDecimal("400.00"));
+        assertThat(result.getExpectedRecoveryValue()).isEqualByComparingTo(new BigDecimal("400.00"));
     }
 
     @Test
@@ -47,6 +47,6 @@ class DecisionServiceTest {
         DecisionResult result = decisionService.selectBestAction(rc, p, List.of("RETRY", "SEND_SMS"));
 
         assertThat(result.getChosenAction()).isEqualTo("NONE");
-        assertThat(result.getExpectedValue()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(result.getExpectedRecoveryValue()).isEqualByComparingTo(BigDecimal.ZERO);
     }
 }

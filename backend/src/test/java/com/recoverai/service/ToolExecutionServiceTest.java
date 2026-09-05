@@ -59,9 +59,9 @@ class ToolExecutionServiceTest {
 
         toolExecutionService.execute(rc, payment);
 
-        verify(paymentLinkService).createPaymentLink(eq(payment), eq(caseId + "-RETRY-1"));
-        verify(auditService).logEvent(eq(caseId), eq("ACTION_EXECUTED"), anyMap());
-        verify(auditService).logEvent(eq(caseId), eq("STATE_CHANGED"), anyMap());
+        verify(paymentLinkService).createPaymentLink(eq(rc), eq(payment), eq(caseId + "-RETRY-1"));
+        verify(auditService).logEvent(eq(caseId), eq("TOOL_EXECUTION"), anyMap());
+        verify(auditService).logEvent(eq(caseId), eq("OUTCOME"), anyMap());
 
         assertThat(rc.getStatus()).isEqualTo(CaseState.WAITING);
     }
@@ -82,7 +82,7 @@ class ToolExecutionServiceTest {
 
         toolExecutionService.execute(rc, payment);
 
-        verify(notificationSender).send(eq("SEND_SMS"), eq("cust_123"), eq(caseId + "-SEND_SMS-1"));
+        verify(notificationSender).send(eq("SEND_SMS"), eq("cust_123"), eq(caseId + "-SEND_SMS-1"), any(), any());
         assertThat(rc.getStatus()).isEqualTo(CaseState.WAITING);
     }
 
@@ -99,11 +99,11 @@ class ToolExecutionServiceTest {
 
         when(auditEventRepository.findByCaseIdOrderBySequenceNoAsc(caseId)).thenReturn(List.of());
 
-        doThrow(new RuntimeException("Razorpay API Error: 500")).when(paymentLinkService).createPaymentLink(any(), any());
+        doThrow(new RuntimeException("Razorpay API Error: 500")).when(paymentLinkService).createPaymentLink(any(), any(), any());
 
         toolExecutionService.execute(rc, payment);
 
-        verify(auditService).logEvent(eq(caseId), eq("ACTION_FAILED"), argThat(obj -> obj instanceof java.util.Map && ((java.util.Map<?,?>) obj).get("reason").equals("Razorpay API Error: 500")));
+        verify(auditService).logEvent(eq(caseId), eq("TOOL_EXECUTION"), argThat(obj -> obj instanceof java.util.Map && ((java.util.Map<?,?>) obj).get("result").equals("FAILED — Razorpay API Error: 500")));
         
         assertThat(rc.getStatus()).isEqualTo(CaseState.DIAGNOSING);
         assertThat(rc.getNextRunAt()).isNotNull();

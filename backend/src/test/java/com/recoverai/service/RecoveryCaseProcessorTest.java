@@ -84,7 +84,7 @@ class RecoveryCaseProcessorTest {
         when(paymentRepository.findById("pay_123")).thenReturn(Optional.of(payment));
         when(diagnosisService.diagnose(payment, rc)).thenReturn(aiResponse);
         when(auditEventRepository.findByCaseIdOrderBySequenceNoAsc(rc.getId())).thenReturn(List.of());
-        PolicyEvaluationResult policyResult = new PolicyEvaluationResult(List.of(), List.of("SEND_EMAIL"));
+        PolicyEvaluationResult policyResult = new PolicyEvaluationResult(List.of(), List.of("SEND_EMAIL"), false);
         when(policyEngine.filterPermittedActions(eq(rc), eq(payment), eq(aiResponse.getCandidateActions()), anyList())).thenReturn(policyResult);
         
         DecisionResult decisionResult = new DecisionResult("SEND_EMAIL", new BigDecimal("500.00"));

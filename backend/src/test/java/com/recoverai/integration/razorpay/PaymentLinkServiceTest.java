@@ -31,7 +31,10 @@ class PaymentLinkServiceTest {
 
         String idempotencyKey = "case-1-RETRY-1";
 
-        paymentLinkService.createPaymentLink(payment, idempotencyKey);
+        com.recoverai.domain.recovery.RecoveryCase rc = new com.recoverai.domain.recovery.RecoveryCase();
+        rc.setId(java.util.UUID.randomUUID());
+        
+        paymentLinkService.createPaymentLink(rc, payment, idempotencyKey);
 
         verify(razorpayClient).createPaymentLink(
             argThat(payload -> {

@@ -64,6 +64,7 @@ class IngestionServiceTest {
         Payment savedPayment = paymentCaptor.getValue();
         assertThat(savedPayment.getId()).isEqualTo("pay_123");
         assertThat(savedPayment.getAmount()).isEqualTo(BigDecimal.valueOf(1000));
+        assertThat(savedPayment.getEmail()).isNull(); // entity had no email set
 
         ArgumentCaptor<RecoveryCase> caseCaptor = ArgumentCaptor.forClass(RecoveryCase.class);
         verify(recoveryCaseRepository).save(caseCaptor.capture());
@@ -71,8 +72,7 @@ class IngestionServiceTest {
         assertThat(savedCase.getPaymentId()).isEqualTo("pay_123");
         assertThat(savedCase.getStatus()).isEqualTo(CaseState.ELIGIBLE);
 
-        verify(auditService).logEvent(eq(savedCase.getId()), eq("CASE_RECEIVED"), any(Map.class));
-        verify(auditService).logEvent(eq(savedCase.getId()), eq("STATE_CHANGED"), any(Map.class));
+        verify(auditService).logEvent(eq(savedCase.getId()), eq("WEBHOOK_VERIFIED"), any(Map.class));
     }
 
     @Test
