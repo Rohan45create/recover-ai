@@ -58,6 +58,7 @@ export function Sidebar({ isOpen = false }: SidebarProps) {
             <NavLink
               key={item.name}
               to={item.to}
+              end={item.to === '/app'}
               className={({ isActive }) => clsx(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors duration-200",
                 isActive 

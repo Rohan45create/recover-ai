@@ -15,6 +15,7 @@ export interface DashboardOverviewResponse {
   active_cases: number;
   total_cases: number;
   policy_violations: number;
+  efficiency_score: number;
   trajectory: TrajectoryPoint[];
 }
 
@@ -32,7 +33,9 @@ export interface RecoveryCase {
   status: string;
   diagnosis: string;
   chosen_action: string;
-  expected_value: number;
+  expected_recovery_value: number;
+  actual_recovered_amount: number | null;
+  payment_link_url: string | null;
 }
 
 export const api = {
@@ -56,8 +59,8 @@ export const api = {
     return response.data;
   },
 
-  getAnalytics: async (): Promise<any> => {
-    const response = await axios.get(`${API_BASE}/dashboard/analytics`);
+  getAnalytics: async (params?: { range?: string; diagnosis?: string; action?: string }): Promise<any> => {
+    const response = await axios.get(`${API_BASE}/dashboard/analytics`, { params });
     return response.data;
   },
 
@@ -65,7 +68,12 @@ export const api = {
     const response = await axios.get(`${API_BASE}/dashboard/policies`);
     return response.data;
   },
-  
+
+  updatePolicy: async (id: string, patch: { value?: string; enabled?: boolean }): Promise<any> => {
+    const response = await axios.put(`${API_BASE}/dashboard/policies/${id}`, patch);
+    return response.data;
+  },
+
   updatePolicies: async (policies: any[]): Promise<any[]> => {
     const response = await axios.post(`${API_BASE}/dashboard/policies`, policies);
     return response.data;

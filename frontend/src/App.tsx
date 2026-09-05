@@ -6,6 +6,7 @@ import { RecoveryLog } from './pages/RecoveryLog';
 import { Policies } from './pages/Policies';
 import { Settings } from './pages/Settings';
 import { Landing } from './pages/Landing';
+import { DemoCheckout } from './pages/DemoCheckout';
 
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
           <Route path="policies" element={<Policies />} />
           <Route path="settings" element={<Settings />} />
         </Route>
+
+        <Route path="/demo-checkout" element={<DemoCheckout />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
