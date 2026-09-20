@@ -74,7 +74,7 @@ We chose Spring Boot for the backend because it gives a mature, well-tested way 
 
 | Policy | Example limit | Why it exists |
 |---|---|---|
-| Max Recovery Cost | ₹25,000 | The hard ceiling on how much money the system can move without a human approving it — this is what "policy decides" actually means in practice. |
+| Max Recovery Cost (Editable) | ₹25,000 | The hard ceiling on how much money the system can move without a human approving it — this is what "policy decides" actually means in practice. |
 | DND Hours Exclusion | 21:00–08:00 | Matches Indian telecom rules on when unsolicited commercial messages are allowed to be sent — the system will not contact a customer at 2 AM. |
 | Mandate Window Expiry | 24 hours | Matches RBI rules on retrying a UPI/Autopay mandate — retrying too close to a mandate's expiry isn't just pointless, it can break the mandate's terms. |
 | Escalation Threshold | ₹50,000 | Above this amount, instead of the case simply stopping, it's routed to a human review queue — so the system hands off instead of giving up. |
